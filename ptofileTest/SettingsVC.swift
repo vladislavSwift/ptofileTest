@@ -6,24 +6,37 @@
 //
 
 import UIKit
+import Network
 
 class SettingsVC: UIViewController {
-
+    
+    @IBOutlet weak var internetLabel: UILabel!
+    
+    let networkMonitor = NWPathMonitor()
+    let queque = DispatchQueue(label: "InternetConnectionsMonitor")
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         // Do any additional setup after loading the view.
-    }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
+        
+        networkMonitor.pathUpdateHandler = { pathUpdateHandler in
+            if pathUpdateHandler.status == .satisfied {
+                print("Internet connection is on.")
+                DispatchQueue.main.async {
+                    self.internetLabel.text = "On"
+                }
+                
+            } else {
+                print("There's no internet connection.")
+                DispatchQueue.main.async {
+                    self.internetLabel.text = "Off"
+                }
+            }
+        }
+            networkMonitor.start(queue: queque)
+        }
+        
+		
 
 }
